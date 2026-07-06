@@ -38,10 +38,10 @@ void setup() {
   Serial.begin(115200);
   while(!Serial) {}
 
-  // Initializing the ICM5x6xx
+  // Initializing the ICM536xx
   ret = IMU.begin();
   if (ret != 0) {
-    Serial.print("ICM5x6xx initialization failed: ");
+    Serial.print("ICM536xx initialization failed: ");
     Serial.println(ret);
     while(1);
   }

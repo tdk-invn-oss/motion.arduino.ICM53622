@@ -2,7 +2,7 @@
 
 # ICM536xx Arduino library
 This arduino library for the [TDK/Invensense ICM536xx High Performance 6-Axis MotionTracking<sup>(TM)</sup> IMU](https://invensense.tdk.com/en-us/consumer).
-The ICM-566xx is a high performance 6-axis MEMS MotionTracking device. It has a configurable host interface that supports I3C<sup>SM</sup>, I2C and SPI serial communication, and an I2C master mode interface for connection to external sensors. The device features up to 8Kbytes FIFO and 2 programmable interrupts.
+The ICM-536xx is a high performance 6-axis MEMS MotionTracking device. It has a configurable host interface that supports I3C<sup>SM</sup>, I2C and SPI serial communication, and an I2C master mode interface for connection to external sensors. The device features up to 8Kbytes FIFO and 2 programmable interrupts.
 This library supports both I2C and SPI commmunication with the ICM536xx.
 
 # Software setup

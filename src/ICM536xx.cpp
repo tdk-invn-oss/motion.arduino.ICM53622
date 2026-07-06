@@ -227,36 +227,6 @@ int ICM536xx::setApexInterrupt(uint8_t intpin, ICM536xx_irq_handler handler)
 int ICM536xx::startAllApex(uint8_t intpin, ICM536xx_irq_handler handler)
 {
   int rc = 0;
-  inv_imu_apex_parameters_t apex_inputs;
-
-  /* Optimize APEX parameters for SmartMotion+EVB setup */
-  rc |= inv_imu_apex_init_parameters_struct(&icm_driver, &apex_inputs);
-  apex_inputs.tilt_wait_time	   = APEX_CONFIG5_TILT_WAIT_TIME_2_S;
-  apex_inputs.power_save_time	   = APEX_CONFIG2_DMP_POWER_SAVE_TIME_SEL_8_S;
-  apex_inputs.power_save		   = INV_IMU_DISABLE;
-  apex_inputs.ff_debounce_duration = APEX_CONFIG9_FF_DEBOUNCE_DURATION_2000_MS;
-  apex_inputs.ff_max_duration_cm   = APEX_CONFIG12_FF_MAX_DURATION_228_CM;
-  apex_inputs.ff_min_duration_cm   = APEX_CONFIG12_FF_MIN_DURATION_10_CM;
-  apex_inputs.lowg_peak_th		   = APEX_CONFIG10_LOWG_PEAK_TH_500_MG;
-  apex_inputs.lowg_peak_hyst	   = APEX_CONFIG5_LOWG_PEAK_TH_HYST_31_MG;
-  apex_inputs.lowg_samples_th	   = APEX_CONFIG10_LOWG_TIME_TH_8_SAMPLES;
-  apex_inputs.highg_peak_th 	   = APEX_CONFIG11_HIGHG_PEAK_TH_7250_MG;
-  apex_inputs.highg_peak_hyst	   = APEX_CONFIG5_HIGHG_PEAK_TH_HYST_156_MG;
-  apex_inputs.highg_samples_th	   = APEX_CONFIG11_HIGHG_TIME_TH_1_SAMPLE;
-  apex_inputs.tap_max			   = APEX_CONFIG2_TAP_MAX_TRIPLE;
-  apex_inputs.tap_min			   = APEX_CONFIG2_TAP_MIN_SINGLE;
-  apex_inputs.tap_tavg			   = APEX_CONFIG3_TAP_TAVG_8;
-  apex_inputs.tap_tmax			   = APEX_CONFIG3_TAP_TMAX_500_MS;
-  apex_inputs.tap_tmin			   = APEX_CONFIG3_TAP_TMIN_165_MS;
-  apex_inputs.tap_max_peak_tol	   = APEX_CONFIG4_TAP_MAX_PEAK_TOL_37_5;
-  apex_inputs.tap_min_jerk_thr	   = APEX_CONFIG4_TAP_MIN_JERK_THR_1125mg;
-  apex_inputs.tap_smudge_reject_th = APEX_CONFIG9_TAP_SMUDGE_REJECT_THR_85_MS;
-#if INV_IMU_ACC_HFSR_SUPPORTED
-  apex_inputs.ext_highg_samples_th = APEX_CONFIG14_EXT_HIGHG_TIME_TH_1_SAMPLE;
-  apex_inputs.ext_highg_peak_hyst  = APEX_CONFIG14_EXT_HIGHG_PEAK_TH_HYST_250_MG;
-  apex_inputs.ext_highg_peak_th    = APEX_CONFIG14_EXT_HIGHG_PEAK_TH_20_G;
-#endif
-  rc |= inv_imu_apex_configure_parameters(&icm_driver, &apex_inputs);
 
   apex_enable[ICM536XX_APEX_TILT]  = true;
   apex_enable[ICM536XX_APEX_TAP]   = true;
@@ -404,6 +374,37 @@ int ICM536xx::configure_and_enable_edmp_algo(void)
   accel_config0_odr_t    accel_odr;
   inv_imu_int_state_t    int_config;
   apex_config1_dmp_odr_t dmp_odr;
+  inv_imu_fifo_config_t 	fifo_config;
+  inv_imu_apex_parameters_t apex_inputs;
+  
+  /* Optimize APEX parameters for SmartMotion+EVB setup */
+  rc |= inv_imu_apex_init_parameters_struct(&icm_driver, &apex_inputs);
+  apex_inputs.tilt_wait_time		 = APEX_CONFIG5_TILT_WAIT_TIME_2_S;
+  apex_inputs.power_save_time 	 = APEX_CONFIG2_DMP_POWER_SAVE_TIME_SEL_8_S;
+  apex_inputs.power_save			 = INV_IMU_DISABLE;
+  apex_inputs.ff_debounce_duration = APEX_CONFIG9_FF_DEBOUNCE_DURATION_2000_MS;
+  apex_inputs.ff_max_duration_cm	 = APEX_CONFIG12_FF_MAX_DURATION_228_CM;
+  apex_inputs.ff_min_duration_cm	 = APEX_CONFIG12_FF_MIN_DURATION_10_CM;
+  apex_inputs.lowg_peak_th		 = APEX_CONFIG10_LOWG_PEAK_TH_500_MG;
+  apex_inputs.lowg_peak_hyst		 = APEX_CONFIG5_LOWG_PEAK_TH_HYST_31_MG;
+  apex_inputs.lowg_samples_th 	 = APEX_CONFIG10_LOWG_TIME_TH_8_SAMPLES;
+  apex_inputs.highg_peak_th		 = APEX_CONFIG11_HIGHG_PEAK_TH_7250_MG;
+  apex_inputs.highg_peak_hyst 	 = APEX_CONFIG5_HIGHG_PEAK_TH_HYST_156_MG;
+  apex_inputs.highg_samples_th	 = APEX_CONFIG11_HIGHG_TIME_TH_1_SAMPLE;
+  apex_inputs.tap_max 			 = APEX_CONFIG2_TAP_MAX_TRIPLE;
+  apex_inputs.tap_min 			 = APEX_CONFIG2_TAP_MIN_SINGLE;
+  apex_inputs.tap_tavg			 = APEX_CONFIG3_TAP_TAVG_8;
+  apex_inputs.tap_tmax			 = APEX_CONFIG3_TAP_TMAX_500_MS;
+  apex_inputs.tap_tmin			 = APEX_CONFIG3_TAP_TMIN_165_MS;
+  apex_inputs.tap_max_peak_tol	 = APEX_CONFIG4_TAP_MAX_PEAK_TOL_37_5;
+  apex_inputs.tap_min_jerk_thr	 = APEX_CONFIG4_TAP_MIN_JERK_THR_1125mg;
+  apex_inputs.tap_smudge_reject_th = APEX_CONFIG9_TAP_SMUDGE_REJECT_THR_85_MS;
+#if INV_IMU_ACC_HFSR_SUPPORTED
+  apex_inputs.ext_highg_samples_th = APEX_CONFIG14_EXT_HIGHG_TIME_TH_1_SAMPLE;
+  apex_inputs.ext_highg_peak_hyst  = APEX_CONFIG14_EXT_HIGHG_PEAK_TH_HYST_250_MG;
+  apex_inputs.ext_highg_peak_th	 = APEX_CONFIG14_EXT_HIGHG_PEAK_TH_20_G;
+#endif
+  rc |= inv_imu_apex_configure_parameters(&icm_driver, &apex_inputs);
 
   /* Configure ODR depending on which feature is enabled */
   if (apex_enable[ICM536XX_APEX_FF] || apex_enable[ICM536XX_APEX_LOWG] || apex_enable[ICM536XX_APEX_HIGHG] || apex_enable[ICM536XX_APEX_TAP]) {
@@ -417,6 +418,17 @@ int ICM536xx::configure_and_enable_edmp_algo(void)
     dmp_odr	  = APEX_CONFIG1_DMP_ODR_50Hz;
     accel_odr = ACCEL_CONFIG0_ODR_50_HZ;
   }
+
+  /* Disable FIFO to optimize power consumption */
+  rc |= inv_imu_get_fifo_config(&icm_driver, &fifo_config);
+  fifo_config.fifo_en = INV_IMU_DISABLE;
+  rc |= inv_imu_set_fifo_config(&icm_driver, &fifo_config);
+  
+  /* Set 2X averaging to minimize power consumption */
+  rc |= inv_imu_set_accel_lp_avg(&icm_driver, ACCEL_CONFIG1_ACCEL_FILT_AVG_2);
+  
+  /* Enable accel in LP mode */
+  rc |= inv_imu_set_accel_mode(&icm_driver, PWR_MGMT0_ACCEL_MODE_LP);
 
   /* Set EDMP ODR */
   rc |= inv_imu_apex_set_frequency(&icm_driver, dmp_odr);
@@ -563,12 +575,13 @@ accel_config0_fs_sel_t ICM536xx::accel_fsr_g_to_param(uint16_t accel_fsr_g) {
   accel_config0_fs_sel_t ret = ACCEL_CONFIG0_FS_SEL_16g;
 
   switch(accel_fsr_g) {
-  case 2:  ret = ACCEL_CONFIG0_FS_SEL_2g;  break;
   case 4:  ret = ACCEL_CONFIG0_FS_SEL_4g;  break;
   case 8:  ret = ACCEL_CONFIG0_FS_SEL_8g;  break;
   case 16: ret = ACCEL_CONFIG0_FS_SEL_16g; break;
 #if INV_IMU_ACC_HFSR_SUPPORTED
   case 32: ret = ACCEL_CONFIG0_FS_SEL_32g; break;
+#else
+  case 2:  ret = ACCEL_CONFIG0_FS_SEL_2g;  break;
 #endif
   default:
     /* Unknown accel FSR. Set to default 16G */
@@ -581,12 +594,17 @@ gyro_config0_fs_sel_t ICM536xx::gyro_fsr_dps_to_param(uint16_t gyro_fsr_dps) {
   gyro_config0_fs_sel_t ret = GYRO_CONFIG0_FS_SEL_2000dps;
 
   switch(gyro_fsr_dps) {
+  case 31:   ret = GYRO_CONFIG0_FS_SEL_31dps;   break;
+  case 62:   ret = GYRO_CONFIG0_FS_SEL_62dps;   break;
+  case 125:  ret = GYRO_CONFIG0_FS_SEL_125dps;  break;
   case 250:  ret = GYRO_CONFIG0_FS_SEL_250dps;  break;
   case 500:  ret = GYRO_CONFIG0_FS_SEL_500dps;  break;
   case 1000: ret = GYRO_CONFIG0_FS_SEL_1000dps; break;
   case 2000: ret = GYRO_CONFIG0_FS_SEL_2000dps; break;
 #if INV_IMU_GYR_HFSR_SUPPORTED
   case 4000: ret = GYRO_CONFIG0_FS_SEL_4000dps; break;
+#else
+  case 15:   ret = GYRO_CONFIG0_FS_SEL_15dps;   break;
 #endif
   default:
     /* Unknown gyro FSR. Set to default 2000dps" */

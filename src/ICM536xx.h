@@ -21,10 +21,10 @@
 #include "Arduino.h"
 #include "SPI.h"
 #include "Wire.h"
-#include "invn/platform_define.h"
+#include "Invn/platform_define.h"
 
 extern "C" {
-#include "invn/InvError.h"
+#include "Invn/InvError.h"
 #include "imu/inv_imu_driver_advanced.h"
 #include "imu/inv_imu_apex.h"
 }
