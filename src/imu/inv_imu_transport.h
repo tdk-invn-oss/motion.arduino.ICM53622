@@ -69,7 +69,6 @@ typedef struct {
 	void *              context;
 	inv_imu_read_reg_t  read_reg; /**< Function pointer to read register(s). */
 	inv_imu_write_reg_t write_reg; /**< Function pointer to write register(s). */
-	uint32_t            serif_type; /**< Serial interface type. */
 
 	/** @brief Callback to sleep function.
 	 *  @param[in] us  Time to sleep in microseconds.
@@ -83,6 +82,8 @@ typedef struct {
 	 *  @return 0 on success, negative value on error.
 	 */
 	int (*configure_host_interface)(uint32_t serif_type);
+
+	uint32_t serif_type; /**< Serial interface type. */
 
 	/** Contains mirrored values of some IP registers. */
 	struct register_cache {
